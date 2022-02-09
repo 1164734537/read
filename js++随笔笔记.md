@@ -161,7 +161,7 @@ document.write(z);
 
 ### 栈内存和堆内存
 
-![image-20220106093544954](C:\Users\123\AppData\Roaming\Typora\typora-user-images\image-20220106093544954.png)
+![image-20220106093544954](.\typora-user-images\image-20220106093544954.png)
 
 
 
@@ -185,11 +185,11 @@ var b=a;
 
 var a = 3; 在栈内 最先进入， 即 把 1008 命名为 a, 空间中存放值 3
 
-![image-20220106094705698](C:\Users\123\AppData\Roaming\Typora\typora-user-images\image-20220106094705698.png)
+![image-20220106094705698](.\typora-user-images\image-20220106094705698.png)
 
 var b =a; 第二个进入，依次存放， 1007 处 命名为 b ，同时拷贝 a 空间的值 ’3‘，存放到b空间
 
-![image-20220106094843925](C:\Users\123\AppData\Roaming\Typora\typora-user-images\image-20220106094843925.png)
+![image-20220106094843925](.\typora-user-images\image-20220106094843925.png)
 
 a = 1;  看上去是重新赋值， 实际，在栈内存中， 是 把原本的 a 还原为 1008 
 
@@ -197,7 +197,7 @@ a = 1;  看上去是重新赋值， 实际，在栈内存中， 是 把原本的
 
 
 
-![image-20220106095058451](C:\Users\123\AppData\Roaming\Typora\typora-user-images\image-20220106095058451.png)
+![image-20220106095058451](.\typora-user-images\image-20220106095058451.png)
 
 实际上， 1008上面的值，是没被清除的，所以这个值将永久存在，直到内存满了，被新的值所覆盖
 
@@ -213,7 +213,7 @@ var arr2 = arr1
 
 arr1.push(5)
 
-![image-20220106102235900](C:\Users\123\AppData\Roaming\Typora\typora-user-images\image-20220106102235900.png)
+![image-20220106102235900](.\typora-user-images\image-20220106102235900.png)
 
 
 
@@ -241,7 +241,7 @@ var arr2 = arr1
 
 arr1 = [1,2] 对arr1 重新赋值,就是下图
 
-![image-20220106103411595](C:\Users\123\AppData\Roaming\Typora\typora-user-images\image-20220106103411595.png)
+![image-20220106103411595](.\typora-user-images\image-20220106103411595.png)
 
 重新赋值不影响，添加，修改是会影响
 
@@ -1661,7 +1661,7 @@ console.log(Handphone.prototype) //{ constructor: f Telephone() }
 
 
 
-![image-20220114095340091](C:\Users\123\AppData\Roaming\Typora\typora-user-images\image-20220114095340091.png)
+![image-20220114095340091](.\typora-user-images\image-20220114095340091.png)
 
 
 
