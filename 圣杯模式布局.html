@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<style>
+		.clearfix::after{
+			display: table;
+			content: '';
+			clear: both;
+		}
+		.wrap{
+			width: 700px;
+			margin: 0 auto;
+		}
+		.top,.foo{
+			height: 50px;
+			background: pink;
+		}
+		.main{
+			/* 4.留出左右两个空位,让 3.1 中因为移出mian 盒子的元素回归，并覆盖在 main padding-left 上 */
+			padding: 0 100px; 
+			/*5.设置 溢出隐藏，保持以最高一列展示高度*/
+			overflow: hidden;
+		}
+		.main .left,
+		.main .right,
+		.main .content{
+			/*1.左浮动，让其一行排列*/
+			float: left;   
+			/*3.相对定位*/
+			position: relative;
+			/*margin-bottom 负值 元素本身不变，下面的元素往上移动， 盒子与盒子的距离变成了负数*/
+			margin-bottom: -4000px;
+			/*增大盒子模型底部的高度，让其抵消来自盒子距离的负值，让负值走在padding上*/
+			padding-bottom: 4000px;
+
+			
+		}
+		.main .left{
+			background: yellow;
+			width: 100px; 
+			/* 3.1 让left的元素 移动距离本身-100像素的距离，正好移出 main */ 
+			left: -100px; 
+		}
+		.main .content{
+			width: 100%;
+			/* 2.margin-left负值 向左拖拽content，因为 正好 left 也是100 所以覆盖住*/
+			margin-left: -100px;
+			background: #f0c;
+		}
+		.main .right{
+			background-color: green;
+			width: 100px;
+			/*使用相对定位，让right 移动距离本身100像素的距离，正好搭mian 盒子 padding-right  上面*/
+			left: 100px;
+			/*5.margin-left负值 向左拖拽 right 元素 100像素, 正好搭在content 元素上面*/
+			margin-left: -100px;
+		}
+	</style>
+</head>
+<body>
+	<!-- CSS圣杯模式,也叫双飞翼 -->
+	<!-- 目的就是三栏设计，三栏排成一排，依照最高的一栏来设计高度 -->
+	<div class="warp">
+		<div class="top"></div>
+		<div class="main clearfix">
+			<div class="left">123</div>
+			<div class="content">77777<br />123</div>
+			<div class="right">123</div>
+		</div>
+		<div class="foo"></div>
+	</div>
+</body>
+</html>

@@ -1928,6 +1928,260 @@ computed.div();
 
 
 
+原型是在构造函数之上的
+
+```
+function Person(){
+
+}
+
+Person.prototype.name = 'Lucy';
+ var p = new Person();
+ conosle.log(p);  原型上可以找到name
+ 
+ 
+```
+
+原型 -> 继承
+
+```
+// 在教授的原型上加入属性
+Professor.prototype = {
+	name: 'MR. zhang',
+	tSkill:'java'
+}
+// 教授构造函数
+function Professor(){}
+
+// 实例化一个教授
+var professor = new Professor();
+
+//把实例化的教授放在 老师的构造函数的原型上
+Teacher.prototype = professor;
+
+// 老师的构造函数
+function Teacher(){
+	this.name = 'mr.wang';
+	this.mSkill = 'JS/SQ'
+}
+
+// 实例化 老师
+var teacher = new Teacher()
+
+// 查看·变化
+// console.log(teacher)  
+// 可以看到有自己的属性，
+// 在 __proto__ 上可以看到的就是 'Teacher.prototype'，
+// 在上面 我们是 用 教授实例化 professor 赋值给 'Teacher.prototype' 的
+// 因为 教授 的 实例化对象 professor 里面 是 没有 任何赋值，所以为空 （this 是空）
+// 在教授的实例化对象 professor 的 __proto__ 上可以看到 原型对象就是 Professor.prototype, 这里面就有值了
+
+// 老师的实例化函数，赋值给 学生构造函数的原型对象
+Student.prototype = teacher;
+// 学生的构造函数
+function Student(){
+	this.name = 'mr.li';
+	this.pSkill = 'html/css';
+}
+
+// 实例化学生
+var student = new Student();
+console.log(student) 
+
+// 也就是说 实例化 student 有自身的属性
+// 也继承了 实例化 teacher实例化对象 上的属性
+// 同时，也继承了 Professor 原型上的属性 
+
+问题思考：
+	学生是否需要继承 Teacher 和 prfessor
+
+```
+
+
+
+思考延续：
+
+```
+// 问题思考：
+// 	学生是否需要继承 Teacher 和 professor的属性?
+// 就像 name 值一样，需要继承嘛？ 没必要吧！
+// 这样的继承，没必要，也不科学，不友好
+
+// 其他方式解决？
+// call, apply 来解决
+
+// 为了检测可以访问原型的操作
+Teacher.prototype.wife = 'Ms liu';
+
+function Teacher(name, mSkill){
+	this.name = name;
+	this.mSkill = mSkill;
+}
+
+function Student(name, mSkill, age, majar){
+	Teacher.apply(this,[name, mSkill]);
+	this.age = age;
+	this.majar = majar;
+}
+
+var student = new Student(
+	'Mr.zhang',
+	'js/jq',
+	18,
+	'computer'
+)
+
+console.log(student)
+
+// 好像可以，但是再看看，貌似不能访问 Teacher 的原型？
+console.log(student.wife) // undefined ,所以不可以访问Teacher 的原型
+// 每一次 new 都要走一遍  Teacher.apply(this,[name, mSkill]);
+// 好像也不科学 ， 这种 用于借用别人的方法，而不是继承
+```
+
+再来：
+
+```
+function Teacher(){
+	this.name = 'Mr. li';
+	this.tSkill = 'java'
+}
+// 这个是公共原型
+Teacher.prototype = {
+	pSkill:'js/jq'
+}
+
+
+var t =  new Teacher();
+console.log(t) 
+// 可以发现，有实例化自身属性，以及 原型上的 pSkill
+
+function Student(){
+	this.name = 'Mr.wang';
+}
+
+// *1操作   把 构造函数Teacher 的原型赋值给 学生构造函数的原型 ，  请记住这一步. 很重要
+// 这样的相等法，就是引用地址了。 任意一个修改，两边都会进行修改！！！
+Student.prototype = Teacher.prototype;
+
+var s = new Student();
+console.log(s)
+// 可以发现有 自身 studet 的属性
+
+
+// 因为我们目的是为了继承Teahcer -> 所以需要 *1 的操作
+// 这时候再看 实例化 s 的值
+// 可以发现 已经实现了继承， 并且，只继承了 Teacher原型上的属性（pSkill），而不是Teacher构造函数上的属性(name和 tSkill)
+```
+
+逐步完善：
+
+```
+上面的还是有所缺陷：
+因为我在Student原型上加入东西， 会影响到 Teacher 的原型
+如何解决这个问题呢？ 不影响公共原型
+
+// 企业级的办法
+
+function Teacher(){
+	this.name = 'Mr. li';
+	this.tSkill = 'java'
+}
+
+// 公共原型
+Teacher.prototype = {
+	pSkill:'js/jq'
+}
+var t =  new Teacher();
+console.log(t) 
+// 可以发现，有实例化自身属性，以及 原型上的 pSkill
+
+function Student(){
+	this.name = 'Mr.wang';
+}
+
+//  现在的问题就是 如果 Student 的原型 和 Teacher 的 原型 如果进行直接赋值  就会导致两个引用地址相同，就会引起互相修改的问题
+
+// 有没有什么办法 让 Student 的原型 赋值一个什么东西   而这个东西 又继承于  Teacher 的原型, 同时又可以阻断 两个之间的沟通
+
+// 使用中间 的 对象中间    让这个对象拥有 Teacher 的原型 
+// 而 这个 对象 实例化以后，接受的是 Teacher 的 原型
+//  然后 在把实例化 的对象 赋值 给  Student 的 原型
+
+// 使用中转对象
+function Buffer(){}
+// 让其继承 公共原型
+Buffer.prototype = Teacher.prototype;
+// 实例化 中转对象
+var buffer = new Buffer();  // 相当于开辟一个新的空间 是 this ,此时this 为空， 所以 此时 学生的原型为空，但是 this 里面 还有原型，他是  公共原型
+Student.prototype = buffer;  //  这里是 this  为空 赋值给 学生构造函数的 原型 ， this 对象 里面的原型 才是公共原型
+// 这时候 就实现了阻断， 在学生构造函数的原型加入 值 ，就不会影响 公共原型， 因为会写入 this 这个空对象里面
+Student.prototype.age =18; 
+// 相当于
+ // this ={
+ // 	age: 18,
+ // 	__proto__ : Teacher.prototype
+ // }
+var s = new Student();
+
+
+
+```
+
+写的更优雅一点：
+
+```
+// 上述代码，就是企业级的代码 ，就是 圣杯模式
+Teacher.prototype.name = 'czh'
+function Teacher(){}
+function Student(){}
+inherit(Student,Teacher)
+
+var t = new Teacher();
+var s = new Student();
+
+console.log(t)
+console.log(s)
+// inherit 继承的意思
+// 继承方 是 Student
+// 被继承方 是 Teacher
+// inherit(继承方, 被继承方 )
+function inherit(Target, Origin){
+	function Buffer(){};
+	Buffer.prototype = Origin.prototype;
+	Target.prototype =  new Buffer();
+}
+
+打印可以发现，Student 已经继承了 Teacher 的原型,并且改变也不会互相影响
+
+再看看，这就完了嘛？
+实例化的 s 的 constructor 是指向什么？
+一般来说， 实例化函数的constructor 是指向构造函数本身，这是一开始就说明的了
+而这里，很明显 s 的 constructor 是指向 f Teacher()
+
+Buffer.prototype = Origin.prototype; 因为这一步
+实际上就是 Origin  就是 Teacher
+原型对象是：
+// Teacher.prototype = {
+	// name : 'czh',
+    // constructor: f Teacher()
+// }
+
+因此，我们还需要，修改  constructor 的指向，让他指向回 构造函数本身
+// inherit(继承方, 被继承方 )
+function inherit(Target, Origin){
+	function Buffer(){};
+	Buffer.prototype = Origin.prototype;
+	Target.prototype =  new Buffer();
+	// 修改 constructor, 指回本身,还原构造器
+	Target.prototype.constructor = Target;
+	// 再保存继承源头， 说明继承于谁， 也就是设置 超类
+	Target.prototype.super_class = Origin
+}
+这样就可以看出 Student 实例 的构造器（就是构造函数）
+和 继承源
+```
+
 
 
 
@@ -1994,8 +2248,6 @@ function Car(brand,color){
 Car.apply(newCar,['Benz','red']);
 newCar.run(); // 可以调用到方法
 ```
-
-
 
 
 
@@ -2356,4 +2608,109 @@ console.log(p)
 
 
 callee / caller
+
+callee 在下面是arguments 下的一个属性
+
+```
+	//callee 返回正在被执行的函数对象
+	function test(a, b, c){
+		console.log(arguments.callee.length);  // arguments.callee  -> test函数本身
+		console.log(test.length);
+		console.log(arguments.length);
+	}
+	test(1, 2);
+	
+```
+
+
+
+```
+	function test1(){
+		console.log(arguments.callee);
+		function test2(){
+			console.log(arguments.callee);
+		}
+		test2()
+	}
+
+	test1()
+	
+
+```
+
+输出：
+
+```
+	ƒ test1(){
+		console.log(arguments.callee);
+		function test2(){
+			console.log(arguments.callee);
+		}
+		test2()
+	}
+   ƒ test2(){
+			console.log(arguments.callee);
+		}
+```
+
+适用场景：
+
+```
+// 自执行函数
+// 计算累加插件
+
+var sum = (function(n){
+	if(n<=1){
+		return 1;
+	}
+	return n + arguments.callee(n-1); 
+})(10)
+
+console.log(sum)
+```
+
+caller // 在严格模式下报错
+
+```
+test1()
+
+function test1(){
+	test2()
+}
+
+function test2(){
+	console.log(test2.caller);
+}
+/*
+	ƒ test1(){
+		test2()
+	}
+*/
+// 调用当前函数的函数应用，谁当前调用了 test2， 就返回谁
+```
+
+在严格模式下
+
+```
+'use strict';
+
+test1()
+
+function test1(){
+	test2()
+}
+
+function test2(){
+	console.log(test2.caller);
+}
+```
+
+报错信息：
+
+```
+Uncaught TypeError: 'caller', 'callee', and 'arguments' properties may not be accessed on strict mode functions or the arguments objects for calls to them
+    at test2 (plus.html:56:20)
+    at test1 (plus.html:52:2)
+    at plus.html:49:1
+```
 
