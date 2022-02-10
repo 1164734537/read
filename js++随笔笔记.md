@@ -2182,6 +2182,202 @@ function inherit(Target, Origin){
 和 继承源
 ```
 
+想个方法，让圣杯模式，也像闭包一样包装一下
+
+```
+// function test(){
+// 	var Buffer = function (){};
+// 	function inherit(Target, Origin){
+// 		Buffer.prototype = Origin.prototype;
+// 		Target.prototype = new Buffer();
+// 		Target.prototype.constructor = Target;
+// 		Target.prototype.super_class = Origin;
+// 	}
+
+// 	return inherit
+
+// }
+
+
+// Teacher.prototype.name = 'czh'
+// function Teacher(){}   
+// function Student(){}
+
+// // 拿到 返回的函数inherit
+// var inherit = test()
+// inherit(Student, Teacher) // 调用函数
+
+
+// var t = new Teacher();
+// var s = new Student();
+
+// console.log(t)
+// console.log(s)
+
+// 可以发现，已经利用闭包的方式成功继承
+// 但是观看代码, var inherit = test() 这样拿到返回值，好像不方便
+// 使用自执行函数来优化上述代码
+
+//直接在这自执行就可以拿到函数
+// var inherit = (function (){
+// 	var Buffer = function (){};
+// 	function inherit(Target, Origin){
+// 		Buffer.prototype = Origin.prototype;
+// 		Target.prototype = new Buffer();
+// 		Target.prototype.constructor = Target;
+// 		Target.prototype.super_class = Origin;
+// 	}
+// 	return inherit
+// })();
+
+
+// Teacher.prototype.name = 'czh'
+// function Teacher(){}   
+// function Student(){}
+
+// //直接调用函数
+// inherit(Student, Teacher) // 调用函数
+
+
+// var t = new Teacher();
+// var s = new Student();
+
+// console.log(t)
+// console.log(s)
+ 
+// 成功优化，还有，自执行函数中，有 命名的函数 inherit 又返回出去
+// 在自执行函数中，有点多余，让他直接返回一个匿名函数即可，然后 用外部 inherit变量 来 接收 匿名函数
+var inherit = (function (){
+	var Buffer = function (){};
+	return function (Target, Origin){
+		Buffer.prototype = Origin.prototype;
+		Target.prototype = new Buffer();
+		Target.prototype.constructor = Target;
+		Target.prototype.super_class = Origin;
+	}
+	
+})();
+
+
+Teacher.prototype.name = 'czh'
+function Teacher(){}   
+function Student(){}
+
+//直接调用函数
+inherit(Student, Teacher) // 调用函数
+
+
+var t = new Teacher();
+var s = new Student();
+
+console.log(t)
+console.log(s)
+
+```
+
+在多人开发的时候，使用变量接受执行函数，达到模块化的目的
+
+```
+var inherit = (function (){
+	var Buffer = function (){};
+	return function (Target, Origin){
+		Buffer.prototype = Origin.prototype;
+		Target.prototype = new Buffer();
+		Target.prototype.constructor = Target;
+		Target.prototype.super_class = Origin;
+	}
+	
+})();
+
+var initProgramer = (function(){
+	var Programer = function(){};
+	Programer.prototype = {
+		name:'程序员',
+		tool:'计算机',
+		work:'编写程序',
+		duration:'10小时',
+		say:function(){
+			console.log(
+				'我是一名'+ this.myName + this.name + ',我的工作是用'+ this.tool + this.work +
+				',我每天工作'+ this.duration + '我工作需要用到'+ this.lang.toString() + '。'
+			);
+		}
+	}
+
+ 	function FrontEnd(){}
+	function BackEnd(){}
+
+	inherit(FrontEnd,Programer)
+	inherit(BackEnd,Programer)
+
+	FrontEnd.prototype.lang = ['HTML','CSS','JavaScript'];
+	FrontEnd.prototype.myName = '前端'
+
+	BackEnd.prototype.lang = ['node','SQL','Java'];
+	BackEnd.prototype.myName = '后端'
+
+	return {
+		FrontEnd: FrontEnd,
+		BackEnd: BackEnd
+	}
+
+})();
+
+var frontEnd = new initProgramer.FrontEnd()
+var backEnd = new initProgramer.BackEnd()
+console.log(frontEnd)
+console.log(backEnd)
+frontEnd.say()
+backEnd.say()
+```
+
+多人协作
+
+```
+// init 初始化，我个人的空间，我的功能全部写在这，别人要使用，就用我这个
+
+//在页面加载完成的时候执行初始化
+window.onload = function(){
+	init()
+}
+// 一般在函数顶部，会有一个总执行初始化
+function init(){
+	//我的
+	initCompute();
+	//别人的
+	// initxxxx();
+}
+
+
+var initCompute = (function(){
+	var a = 1,
+		b = 2
+
+	function add(){
+		console.log(a + b);
+	}
+	function minus(){
+		console.log(a - b);
+	}
+	function mul(){
+		console.log(a * b);
+	}
+	function div(){
+		console.log(a / b);
+	}
+
+	return function(){
+		add();
+		minus();
+		mul();
+		div();
+	}
+})();
+
+// 需要执行才执行
+// initCompute();
+```
+
 
 
 
