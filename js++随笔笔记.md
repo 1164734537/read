@@ -2331,7 +2331,7 @@ frontEnd.say()
 backEnd.say()
 ```
 
-多人协作
+多人协作，按需使用
 
 ```
 // init 初始化，我个人的空间，我的功能全部写在这，别人要使用，就用我这个
@@ -2378,7 +2378,23 @@ var initCompute = (function(){
 // initCompute();
 ```
 
+插件化写法：
 
+```
+// 插件化开发：
+;(function(){
+	var Slider = function(opt){}
+	Slider.prototype = {
+
+	}
+
+	window.Slider = Slider;
+})();
+
+var slider = new slider({
+	// 配置项
+});
+```
 
 
 
